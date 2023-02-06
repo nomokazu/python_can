@@ -120,3 +120,63 @@ class Steering_Command:
         print("Steer_AngleSpeed : ".ljust(30) + str(self.Steer_AngleSpeed))
         print("Steer_AngleTarget : ".ljust(30) + str(self.Steer_AngleTarget))
         print("---------------------")
+
+class Brake_Command:
+    def __init__(self):
+        self.msg_id = 0x101
+        self.msg_name = "Brake_Command"
+    
+    def setDataFromInt(self, Brake_EnCtrl, Brake_Dec, Brake_Pedal_Target):
+        self.Brake_EnCtrl = Brake_EnCtrl
+        self.Brake_Dec = Brake_Dec
+        self.Brake_Pedal_Target = Brake_Pedal_Target
+    
+    def toData(self):
+        data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+
+        self.raw_Brake_EnCtrl = self.Brake_EnCtrl.to_bytes(1, byteorder='big')
+        self.raw_Brake_Dec = self.Brake_Dec.to_bytes(2, byteorder='big')
+        self.raw_Brake_Pedal_Target = self.Brake_Pedal_Target.to_bytes(2, byteorder='big')
+
+        data[0] = hex(int.from_bytes((self.raw_Brake_EnCtrl), byteorder="big"))
+
+        data[1] = hex(self.raw_Brake_Dec[0])
+        data[2] = hex(self.raw_Brake_Dec[1])
+
+        data[3] = hex(self.raw_Brake_Pedal_Target[0])
+        data[4] = hex(self.raw_Brake_Pedal_Target[1])
+
+        checksum_101 = data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6]
+        data[7] = checksum_101
+
+class Throttle_Command:
+    def __init__(self):
+        self.msg_id = 0x100
+        self.msg_name = "Throttle_Command"
+    
+    def setDataFromInt(self, Dirve_EnCtrl, Dirve_Acc, Dirve_ThrottlePedalTarget, Dirve_SpeedTarget):
+        self.Dirve_EnCtrl = Dirve_EnCtrl
+        self.Dirve_Acc = Dirve_Acc
+        self.Dirve_ThrottlePedalTarget = Dirve_ThrottlePedalTarget
+        self.Dirve_SpeedTarget = Dirve_SpeedTarget
+    
+    def toData(self):
+        data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+
+        self.raw_Dirve_EnCtrl = self.Dirve_EnCtrl.to_bytes(1, byteorder='big')
+        self.raw_Dirve_Acc = self.Dirve_Acc.to_bytes(2, byteorder='big')
+        self.raw_Dirve_ThrottlePedalTarget = self.Dirve_ThrottlePedalTarget.to_bytes(2, byteorder='big')
+        self.raw_Dirve_SpeedTarget = self.Dirve_SpeedTarget.to_bytes(2, byteorder='big')
+
+        data[0] = hex(int.from_bytes((self.raw_Dirve_EnCtrl), byteorder="big"))
+
+        data[1] = hex(self.raw_Dirve_Acc[0])
+        data[2] = hex(self.raw_Dirve_Acc[1])
+        data[3] = hex(self.raw_Dirve_ThrottlePedalTarget[0])
+        data[4] = hex(self.raw_Dirve_ThrottlePedalTarget[1])
+        data[5] = hex(self.raw_Dirve_SpeedTarget[0])
+        data[6] = hex(self.raw_Dirve_SpeedTarget[1])
+
+        checksum_100 = data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6]
+        data[7] = checksum_100
+
