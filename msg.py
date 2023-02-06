@@ -30,6 +30,7 @@ class Msg_Steering_Report:
     
     def view(self):
         print("--- CAN ID = " + str(hex(self.msg_id)).ljust(3,"-") + "----- msg_name = " + str(self.msg_name).ljust(20,"-") +  "--")
+        print(self.data)
         print("Steer_EnState : ".ljust(30) + str(self.Steer_EnState))
         print("Steer_Flt1 : ".ljust(30) + str(self.Steer_Flt1))
         print("Steer_Flt2 : ".ljust(30) + str(self.Steer_Flt2))
@@ -74,3 +75,48 @@ class Msg_Steering_Report:
         self.Steer_AngleRear_Actual = Steer_AngleRear_Actual
         self.Steer_AngleSpeedActual = Steer_AngleSpeedActual
         self.toData()
+
+class Steering_Command:
+    def __init__(self):
+        self.msg_id = 0x102
+        self.msg_name = "Steering_Command"
+    
+    # チェックサムは、後回し
+    def setDataFromInt(self, Steer_EnCtrl, Steer_AngleSpeed, Steer_AngleTarget):
+        self.Steer_EnCtrl = Steer_EnCtrl
+        self.Steer_AngleSpeed = Steer_AngleSpeed
+        self.Steer_AngleTarget = Steer_AngleTarget
+    
+
+    # 逆に配列 list 型に変換する
+    def toData(self):
+        data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+
+        # raw に変換する
+        # 1 ってのは8バイト。2 ってのは16バイトで、表の Bit Length と対応する
+        self.raw_Steer_EnCtrl = self.Steer_EnCtrl.to_bytes(1, byteorder='big')
+        self.raw_Steer_AngleSpeed = self.Steer_AngleSpeed.to_bytes(1, byteorder='big')
+        self.raw_Steer_AngleTarget = self.Steer_AngleTarget.to_bytes(2, byteorder='big')
+        self.raw_CheckSum_102 = self.CheckSum_102.to_bytes(1, byteorder='big')
+
+        # 単純に 16進数に変換するだけ
+        data[0] = hex(int.from_bytes((self.raw_Steer_EnCtrl), byteorder="big"))
+        data[1] = hex(int.from_bytes((self.raw_Steer_AngleSpeed), byteorder="big"))
+        data[7] = hex(int.from_bytes((self.raw_CheckSum_102), byteorder="big"))
+
+        # 配列の2要素にまたがるので、一度 bytearraｙから1つずつ取り出す
+        data[3] = hex(self.raw_Steer_AngleTarget[0])
+        data[4] = hex(self.raw_Steer_AngleTarget[1])
+
+        # チェックサムの計算
+        # https://github.com/ApolloAuto/apollo/blob/93f69712269da572206e021cc7419b21c6feb595/modules/canbus_vehicle/devkit/protocol/steering_command_102.cc
+        checksum_102 = data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6]
+        data[7] = checksum_102
+
+    def view(self):
+        print("--- CAN ID = " + str(hex(self.msg_id)).ljust(3,"-") + "----- msg_name = " + str(self.msg_name).ljust(20,"-") +  "--")
+        print(self.data)
+        print("Steer_EnCtrl : ".ljust(30) + str(self.Steer_EnCtrl))
+        print("Steer_AngleSpeed : ".ljust(30) + str(self.Steer_AngleSpeed))
+        print("Steer_AngleTarget : ".ljust(30) + str(self.Steer_AngleTarget))
+        print("---------------------")
