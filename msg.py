@@ -1,4 +1,4 @@
-class Msg_Steering_Report:
+class Steering_Report:
     def __init__(self):
         self.msg_id = 0x502
         self.msg_name = "Steering_Report"
@@ -121,6 +121,41 @@ class Steering_Command:
         print("checksum_102 : ".ljust(30) + str(self.checksum_102))
         print("---------------------")
 
+class Brake_Report:
+    def __init__(self):
+        self.msg_id = 0x501
+        self.msg_name = "Brake_Report"
+        
+    def setDataFromCANMessage(self, data):
+        self.data = data
+        self.dataParser()
+        self.toInt()
+
+    # データ型の配列から、それぞれのデータを取り出す
+    # とりあえずはあえて bytearray 型　を維持するようにする
+    def dataParser(self):
+        self.raw_Brake_EnState = self.data[0].to_bytes(1, byteorder='big')
+        self.raw_Brake_Flt1 = self.data[1].to_bytes(1, byteorder='big')
+        self.raw_Brake_Flt2 = self.data[2].to_bytes(1, byteorder='big')
+        self.raw_Brake_PedalActual = self.data[3:4+1].to_bytes(1, byteorder='big')
+    
+    # それぞれのデータについて、bytearray型 から Int 型にして取り出す
+    def toInt(self):
+        self.Brake_EnState = int.from_bytes(self.raw_Brake_EnState,"big")
+        self.Brake_Flt1 = int.from_bytes(self.raw_Brake_Flt1, "big")
+        self.Brake_Flt2 = int.from_bytes(self.raw_Brake_Flt2, "big")
+        self.Brake_PedalActual = int.from_bytes(self.raw_Brake_PedalActual, "big")
+    
+    def view(self):
+        print("--- CAN ID = " + str(hex(self.msg_id)).ljust(3,"-") + "----- msg_name = " + str(self.msg_name).ljust(20,"-") +  "--")
+        print(self.data)
+        print("Brake_EnState : ".ljust(30) + str(self.Brake_EnState))
+        print("Brake_Flt1 : ".ljust(30) + str(self.Brake_Flt1))
+        print("Brake_Flt2 : ".ljust(30) + str(self.Brake_Flt2))
+        print("Brake_PedalActual : ".ljust(30) + str(self.Brake_PedalActual))
+        print("---------------------")
+    
+
 class Brake_Command:
     def __init__(self):
         self.msg_id = 0x101
@@ -157,6 +192,40 @@ class Brake_Command:
         print("Brake_Dec : ".ljust(30) + str(self.Brake_Dec))
         print("Brake_Pedal_Target : ".ljust(30) + str(self.Brake_Pedal_Target))
         print("checksum_101 : ".ljust(30) + str(self.checksum_101))
+        print("---------------------")
+
+class Throttle_Report:
+    def __init__(self):
+        self.msg_id = 0x500
+        self.msg_name = "Throttle_Report"
+        
+    def setDataFromCANMessage(self, data):
+        self.data = data
+        self.dataParser()
+        self.toInt()
+
+    # データ型の配列から、それぞれのデータを取り出す
+    # とりあえずはあえて bytearray 型　を維持するようにする
+    def dataParser(self):
+        self.raw_Dirve_EnState = self.data[0].to_bytes(1, byteorder='big')
+        self.raw_Dirve_Flt1 = self.data[1].to_bytes(1, byteorder='big')
+        self.raw_Dirve_Flt2 = self.data[2].to_bytes(1, byteorder='big')
+        self.raw_Dirve_ThrottlePedalActual = self.data[3:4+1].to_bytes(1, byteorder='big')
+    
+    # それぞれのデータについて、bytearray型 から Int 型にして取り出す
+    def toInt(self):
+        self.Dirve_EnState = int.from_bytes(self.raw_Dirve_EnState,"big")
+        self.Dirve_Flt1 = int.from_bytes(self.raw_Dirve_Flt1, "big")
+        self.Dirve_Flt2 = int.from_bytes(self.raw_Dirve_Flt2, "big")
+        self.Dirve_ThrottlePedalActual = int.from_bytes(self.raw_Dirve_ThrottlePedalActual, "big")
+    
+    def view(self):
+        print("--- CAN ID = " + str(hex(self.msg_id)).ljust(3,"-") + "----- msg_name = " + str(self.msg_name).ljust(20,"-") +  "--")
+        print(self.data)
+        print("Dirve_EnState : ".ljust(30) + str(self.Dirve_EnState))
+        print("Dirve_Flt1 : ".ljust(30) + str(self.Dirve_Flt1))
+        print("Dirve_Flt2 : ".ljust(30) + str(self.Dirve_Flt2))
+        print("Dirve_ThrottlePedalActual : ".ljust(30) + str(self.Dirve_ThrottlePedalActual))
         print("---------------------")
 
 class Throttle_Command:
