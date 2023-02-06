@@ -90,28 +90,27 @@ class Steering_Command:
 
     # 逆に配列 list 型に変換する
     def toData(self):
-        data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+        self.data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 
         # raw に変換する
         # 1 ってのは8バイト。2 ってのは16バイトで、表の Bit Length と対応する
         self.raw_Steer_EnCtrl = self.Steer_EnCtrl.to_bytes(1, byteorder='big')
         self.raw_Steer_AngleSpeed = self.Steer_AngleSpeed.to_bytes(1, byteorder='big')
         self.raw_Steer_AngleTarget = self.Steer_AngleTarget.to_bytes(2, byteorder='big')
-        self.raw_CheckSum_102 = self.CheckSum_102.to_bytes(1, byteorder='big')
+
 
         # 単純に 16進数に変換するだけ
-        data[0] = hex(int.from_bytes((self.raw_Steer_EnCtrl), byteorder="big"))
-        data[1] = hex(int.from_bytes((self.raw_Steer_AngleSpeed), byteorder="big"))
-        data[7] = hex(int.from_bytes((self.raw_CheckSum_102), byteorder="big"))
+        self.data[0] = int.from_bytes((self.raw_Steer_EnCtrl), byteorder="big")
+        self.data[1] = int.from_bytes((self.raw_Steer_AngleSpeed), byteorder="big")
 
         # 配列の2要素にまたがるので、一度 bytearraｙから1つずつ取り出す
-        data[3] = hex(self.raw_Steer_AngleTarget[0])
-        data[4] = hex(self.raw_Steer_AngleTarget[1])
+        self.data[3] = self.raw_Steer_AngleTarget[0]
+        self.data[4] = self.raw_Steer_AngleTarget[1]
 
-        # チェックサムの計算
-        # https://github.com/ApolloAuto/apollo/blob/93f69712269da572206e021cc7419b21c6feb595/modules/canbus_vehicle/devkit/protocol/steering_command_102.cc
-        checksum_102 = data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6]
-        data[7] = checksum_102
+
+        # チェックサムはダミー
+        self.checksum_102 = 0
+        self.data[7] = self.checksum_102
 
     def view(self):
         print("--- CAN ID = " + str(hex(self.msg_id)).ljust(3,"-") + "----- msg_name = " + str(self.msg_name).ljust(20,"-") +  "--")
@@ -119,6 +118,7 @@ class Steering_Command:
         print("Steer_EnCtrl : ".ljust(30) + str(self.Steer_EnCtrl))
         print("Steer_AngleSpeed : ".ljust(30) + str(self.Steer_AngleSpeed))
         print("Steer_AngleTarget : ".ljust(30) + str(self.Steer_AngleTarget))
+        print("checksum_102 : ".ljust(30) + str(self.checksum_102))
         print("---------------------")
 
 class Brake_Command:
@@ -132,22 +132,32 @@ class Brake_Command:
         self.Brake_Pedal_Target = Brake_Pedal_Target
     
     def toData(self):
-        data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+        self.data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 
         self.raw_Brake_EnCtrl = self.Brake_EnCtrl.to_bytes(1, byteorder='big')
         self.raw_Brake_Dec = self.Brake_Dec.to_bytes(2, byteorder='big')
         self.raw_Brake_Pedal_Target = self.Brake_Pedal_Target.to_bytes(2, byteorder='big')
 
-        data[0] = hex(int.from_bytes((self.raw_Brake_EnCtrl), byteorder="big"))
+        self.data[0] = int.from_bytes((self.raw_Brake_EnCtrl), byteorder="big")
 
-        data[1] = hex(self.raw_Brake_Dec[0])
-        data[2] = hex(self.raw_Brake_Dec[1])
+        self.data[1] = self.raw_Brake_Dec[0]
+        self.data[2] = self.raw_Brake_Dec[1]
 
-        data[3] = hex(self.raw_Brake_Pedal_Target[0])
-        data[4] = hex(self.raw_Brake_Pedal_Target[1])
+        self.data[3] = self.raw_Brake_Pedal_Target[0]
+        self.data[4] = self.raw_Brake_Pedal_Target[1]
 
-        checksum_101 = data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6]
-        data[7] = checksum_101
+        # チェックサムはダミー
+        self.checksum_101 = 0
+        self.data[7] = self.checksum_101
+    
+    def view(self):
+        print("--- CAN ID = " + str(hex(self.msg_id)).ljust(3,"-") + "----- msg_name = " + str(self.msg_name).ljust(20,"-") +  "--")
+        print(self.data)
+        print("Brake_EnCtrl : ".ljust(30) + str(self.Brake_EnCtrl))
+        print("Brake_Dec : ".ljust(30) + str(self.Brake_Dec))
+        print("Brake_Pedal_Target : ".ljust(30) + str(self.Brake_Pedal_Target))
+        print("checksum_101 : ".ljust(30) + str(self.checksum_101))
+        print("---------------------")
 
 class Throttle_Command:
     def __init__(self):
@@ -161,22 +171,32 @@ class Throttle_Command:
         self.Dirve_SpeedTarget = Dirve_SpeedTarget
     
     def toData(self):
-        data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+        self.data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 
         self.raw_Dirve_EnCtrl = self.Dirve_EnCtrl.to_bytes(1, byteorder='big')
         self.raw_Dirve_Acc = self.Dirve_Acc.to_bytes(2, byteorder='big')
         self.raw_Dirve_ThrottlePedalTarget = self.Dirve_ThrottlePedalTarget.to_bytes(2, byteorder='big')
         self.raw_Dirve_SpeedTarget = self.Dirve_SpeedTarget.to_bytes(2, byteorder='big')
 
-        data[0] = hex(int.from_bytes((self.raw_Dirve_EnCtrl), byteorder="big"))
+        self.data[0] = int.from_bytes((self.raw_Dirve_EnCtrl), byteorder="big")
 
-        data[1] = hex(self.raw_Dirve_Acc[0])
-        data[2] = hex(self.raw_Dirve_Acc[1])
-        data[3] = hex(self.raw_Dirve_ThrottlePedalTarget[0])
-        data[4] = hex(self.raw_Dirve_ThrottlePedalTarget[1])
-        data[5] = hex(self.raw_Dirve_SpeedTarget[0])
-        data[6] = hex(self.raw_Dirve_SpeedTarget[1])
+        self.data[1] = self.raw_Dirve_Acc[0]
+        self.data[2] = self.raw_Dirve_Acc[1]
+        self.data[3] = self.raw_Dirve_ThrottlePedalTarget[0]
+        self.data[4] = self.raw_Dirve_ThrottlePedalTarget[1]
+        self.data[5] = self.raw_Dirve_SpeedTarget[0]
+        self.data[6] = self.raw_Dirve_SpeedTarget[1]
 
-        checksum_100 = data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6]
-        data[7] = checksum_100
+        # チェックサムはダミー
+        self.checksum_100 = 0
+        self.data[7] = self.checksum_100
 
+    def view(self):
+        print("--- CAN ID = " + str(hex(self.msg_id)).ljust(3,"-") + "----- msg_name = " + str(self.msg_name).ljust(20,"-") +  "--")
+        print(self.data)
+        print("Dirve_EnCtrl : ".ljust(30) + str(self.Dirve_EnCtrl))
+        print("Dirve_Acc : ".ljust(30) + str(self.Dirve_Acc))
+        print("Dirve_ThrottlePedalTarget : ".ljust(30) + str(self.Dirve_ThrottlePedalTarget))
+        print("Dirve_SpeedTarget : ".ljust(30) + str(self.Dirve_SpeedTarget))
+        print("checksum_100 : ".ljust(30) + str(self.checksum_100))
+        print("---------------------")

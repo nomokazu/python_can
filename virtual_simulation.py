@@ -4,33 +4,58 @@ import msg
 bus1 = can.interface.Bus('test', bustype='virtual', preserve_timestamps=True)
 bus2 = can.interface.Bus('test', bustype='virtual')
 
-msg1 = can.Message(timestamp=1639740470.051948, arbitration_id=0x502, data=[0x00,0x00,0x01,0x01,0x5A,0x01,0xF4,0xF0])
+#--------------Steering_Command---------------------
+# Steering_Commandメッセージの作成
+message = msg.Steering_Command()
+# メッセージのパラメータの指定
+message.setDataFromInt(0, 100, 400)
+# CAN
+message.toData()
+message.view()
 
-# Messages sent on bus1 will have their timestamps preserved when received
-# on bus2
-bus1.send(msg1)
+#送信データ
+can_msg = can.Message(arbitration_id = message.msg_id, data= message.data, is_extended_id = False)
+
+bus1.send(can_msg)
 msg2 = bus2.recv()
 
 print(msg2)
 print(msg2.data)
 
-messageInstance = msg.Msg_Steering_Report()
-messageInstance.setDataFromCANMessage(msg2.data)
-messageInstance.view()
 
-messageInstance2 = msg.Msg_Steering_Report()
-messageInstance2.setDataFromInt(0,0,1,346,500,240)
-messageInstance2.view()
+#--------------Brake_Command-----------------------
+# Brake_Commandメッセージの作成
+message = msg.Brake_Command()
+# メッセージのパラメータの指定
+message.setDataFromInt(0,3,20)
+# CAN
+message.toData()
+message.view()
 
-assert msg1.arbitration_id == msg2.arbitration_id
-assert msg1.data == msg2.data
-assert msg1.timestamp == msg2.timestamp
+#送信データ
+can_msg = can.Message(arbitration_id = message.msg_id, data= message.data, is_extended_id = False)
 
-# Messages sent on bus2 will not have their timestamps preserved when
-# received on bus1
-bus2.send(msg1)
-msg3 = bus1.recv()
+bus1.send(can_msg)
+msg2 = bus2.recv()
 
-assert msg1.arbitration_id == msg3.arbitration_id
-assert msg1.data == msg3.data
-assert msg1.timestamp != msg3.timestamp
+print(msg2)
+print(msg2.data)
+
+#------------------ Throttle_Command ---------------------
+
+# Throttle_Commandメッセージの作成
+message = msg.Throttle_Command()
+# メッセージのパラメータの指定
+message.setDataFromInt(0,5,30,5)
+# CAN
+message.toData()
+message.view()
+
+#送信データ
+can_msg = can.Message(arbitration_id = message.msg_id, data= message.data, is_extended_id = False)
+
+bus1.send(can_msg)
+msg2 = bus2.recv()
+
+print(msg2)
+print(msg2.data)
