@@ -19,7 +19,7 @@ message.view()
 can_msg = can.Message(arbitration_id = message.msg_id, data= message.data, is_extended_id = False)
 
 # 送信
-# 必ず 20ミリ秒以下で送信ｓうる
+# 必ず 20ミリ秒以下で送信する
 task = bus.send_periodic(can_msg, 0.01)
 assert isinstance(task, can.CyclicSendTaskABC)
 
