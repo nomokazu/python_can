@@ -77,10 +77,9 @@ class Steering_Report:
         self.toData()
 
 class Steering_Command:
-    def __init__(self, crc):
+    def __init__(self):
         self.msg_id = 0x102
         self.msg_name = "Steering_Command"
-        self.crc = crc
     
     # チェックサムは、後回し
     def setDataFromInt(self, Steer_EnCtrl, Steer_AngleSpeed, Steer_AngleTarget):
@@ -108,11 +107,9 @@ class Steering_Command:
         self.data[3] = self.raw_Steer_AngleTarget[0]
         self.data[4] = self.raw_Steer_AngleTarget[1]
 
-
         # チェックサムはダミー
         self.checksum_102 = self.data[0] ^ self.data[1] ^ self.data[2] ^ self.data[3] ^ self.data[4] ^ self.data[5] ^ self.data[6]
-        self.data[7] = self.crc
-        print(self.data[7])
+        self.data[7] = self.checksum_102
 
     def view(self):
         print("--- CAN ID = " + str(hex(self.msg_id)).ljust(3,"-") + "----- msg_name = " + str(self.msg_name).ljust(20,"-") +  "--")
