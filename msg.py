@@ -77,9 +77,10 @@ class Steering_Report:
         self.toData()
 
 class Steering_Command:
-    def __init__(self):
+    def __init__(self, crc):
         self.msg_id = 0x102
         self.msg_name = "Steering_Command"
+        self.crc = crc
     
     # チェックサムは、後回し
     def setDataFromInt(self, Steer_EnCtrl, Steer_AngleSpeed, Steer_AngleTarget):
@@ -109,8 +110,9 @@ class Steering_Command:
 
 
         # チェックサムはダミー
-        self.checksum_102 = 0
-        self.data[7] = self.checksum_102
+        self.checksum_102 = self.data[0] ^ self.data[1] ^ self.data[2] ^ self.data[3] ^ self.data[4] ^ self.data[5] ^ self.data[6]
+        self.data[7] = self.crc
+        print(self.data[7])
 
     def view(self):
         print("--- CAN ID = " + str(hex(self.msg_id)).ljust(3,"-") + "----- msg_name = " + str(self.msg_name).ljust(20,"-") +  "--")
@@ -137,7 +139,7 @@ class Brake_Report:
         self.raw_Brake_EnState = self.data[0].to_bytes(1, byteorder='big')
         self.raw_Brake_Flt1 = self.data[1].to_bytes(1, byteorder='big')
         self.raw_Brake_Flt2 = self.data[2].to_bytes(1, byteorder='big')
-        self.raw_Brake_PedalActual = self.data[3:4+1].to_bytes(1, byteorder='big')
+        self.raw_Brake_PedalActual = self.data[3:4+1]
     
     # それぞれのデータについて、bytearray型 から Int 型にして取り出す
     def toInt(self):
@@ -210,7 +212,7 @@ class Throttle_Report:
         self.raw_Dirve_EnState = self.data[0].to_bytes(1, byteorder='big')
         self.raw_Dirve_Flt1 = self.data[1].to_bytes(1, byteorder='big')
         self.raw_Dirve_Flt2 = self.data[2].to_bytes(1, byteorder='big')
-        self.raw_Dirve_ThrottlePedalActual = self.data[3:4+1].to_bytes(1, byteorder='big')
+        self.raw_Dirve_ThrottlePedalActual = self.data[3:4+1]
     
     # それぞれのデータについて、bytearray型 から Int 型にして取り出す
     def toInt(self):

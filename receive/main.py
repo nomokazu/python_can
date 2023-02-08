@@ -2,7 +2,7 @@ import can
 import time
 
 # バスタイプはよくわからない
-bus = can.interface.Bus(bustype='vector', channel=0, bitrate=500000, app_name='python-can')
+bus = can.interface.Bus(bustype='socketcan', channel="slcan0", bitrate=500000, app_name='python-can')
 
 #受信
 start_time = time.time()
@@ -12,6 +12,6 @@ start_time = time.time()
 while True:
 	message = bus.recv(timeout=1)
 	if message != None:
-		print("CAN ID : " + str(message.arbitration_id))
+		print("CAN ID : " + hex(message.arbitration_id))
 		# 果たしてこれがどんなデータになるかわからん
 		print("Data : " + str(message.data))
