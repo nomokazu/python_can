@@ -41,7 +41,7 @@ class Steering_Report:
     
     # 逆に配列 list 型に変換する
     def toData(self):
-        data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+        self.data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 
         # raw に変換する
         self.raw_Steer_EnState = self.Steer_EnState.to_bytes(1, byteorder='big')
@@ -52,19 +52,17 @@ class Steering_Report:
         self.raw_Steer_AngleSpeedActual = self.Steer_AngleSpeedActual.to_bytes(1, byteorder='big')
 
         # 単純に 16進数に変換するだけ
-        data[0] = hex(int.from_bytes((self.raw_Steer_EnState), byteorder="big"))
-        data[1] = hex(int.from_bytes((self.raw_Steer_Flt1), byteorder="big"))
-        data[2] = hex(int.from_bytes((self.raw_Steer_Flt2), byteorder="big"))
-        data[7] = hex(int.from_bytes((self.raw_Steer_AngleSpeedActual), byteorder="big"))
+        self.data[0] = int.from_bytes((self.raw_Steer_EnState), byteorder="big")
+        self.data[1] = int.from_bytes((self.raw_Steer_Flt1), byteorder="big")
+        self.data[2] = int.from_bytes((self.raw_Steer_Flt2), byteorder="big")
+        self.data[7] = int.from_bytes((self.raw_Steer_AngleSpeedActual), byteorder="big")
 
         # 配列の2要素にまたがるので、一度 bytearraｙから1つずつ取り出す
-        data[3] = hex(self.raw_Steer_AngleActual[0])
-        data[4] = hex(self.raw_Steer_AngleActual[1])
+        self.data[3] = self.raw_Steer_AngleActual[0]
+        self.data[4] = self.raw_Steer_AngleActual[1]
 
-        data[5] = hex(self.raw_Steer_AngleRear_Actual[0])
-        data[6] = hex(self.raw_Steer_AngleRear_Actual[1])
-
-        self.data = data
+        self.data[5] = self.raw_Steer_AngleRear_Actual[0]
+        self.data[6] = self.raw_Steer_AngleRear_Actual[1]
 
     # int型でデータを指定する
     def setDataFromInt(self, Steer_EnState, Steer_Flt1, Steer_Flt2, Steer_AngleActual, Steer_AngleRear_Actual, Steer_AngleSpeedActual):
@@ -74,7 +72,6 @@ class Steering_Report:
         self.Steer_AngleActual = Steer_AngleActual
         self.Steer_AngleRear_Actual = Steer_AngleRear_Actual
         self.Steer_AngleSpeedActual = Steer_AngleSpeedActual
-        self.toData()
 
 class Steering_Command:
     def __init__(self):
@@ -87,6 +84,22 @@ class Steering_Command:
         self.Steer_AngleSpeed = Steer_AngleSpeed
         self.Steer_AngleTarget = Steer_AngleTarget
     
+    def setDataFromCANMessage(self, data):
+        self.data = data
+        self.dataParser()
+        self.toInt()
+    
+    def dataParser(self):
+        self.raw_Steer_EnCtrl = self.data[0].to_bytes(1, byteorder='big')
+        self.raw_Steer_AngleSpeed = self.data[1].to_bytes(1, byteorder='big')
+        self.raw_Steer_AngleTarget = self.data[3:4+1]
+        self.raw_checksum_102 = self.data[7].to_bytes(1, byteorder='big')
+    
+    def toInt(self):
+        self.Steer_EnCtrl = int.from_bytes(self.raw_Steer_EnCtrl,"big")
+        self.Steer_AngleSpeed = int.from_bytes(self.raw_Steer_AngleSpeed,"big")
+        self.Steer_AngleTarget = int.from_bytes(self.raw_Steer_AngleTarget,"big")
+        self.checksum_102 = int.from_bytes(self.raw_checksum_102,"big")
 
     # 逆に配列 list 型に変換する
     def toData(self):
@@ -154,6 +167,28 @@ class Brake_Report:
         print("Brake_PedalActual : ".ljust(30) + str(self.Brake_PedalActual))
         print("---------------------")
     
+    def toData(self):
+        self.data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+
+        # raw に変換する
+        self.raw_Brake_EnState = self.Brake_EnState.to_bytes(1, byteorder='big')
+        self.raw_Brake_Flt1 = self.Brake_Flt1.to_bytes(1, byteorder='big')
+        self.raw_Brake_Flt2 = self.Brake_Flt2.to_bytes(1, byteorder='big')
+        self.raw_Brake_PedalActual = self.Brake_PedalActual.to_bytes(2, byteorder='big')
+
+        self.data[0] = int.from_bytes((self.raw_Brake_EnState), byteorder="big")
+        self.data[1] = int.from_bytes((self.raw_Brake_Flt1), byteorder="big")
+        self.data[2] = int.from_bytes((self.raw_Brake_Flt2), byteorder="big")
+        
+        self.data[3] = self.raw_Brake_PedalActual[0]
+        self.data[4] = self.raw_Brake_PedalActual[1]
+
+    def setDataFromInt(self, Brake_EnState, Brake_Flt1, Brake_Flt2, Brake_PedalActual):
+        self.Brake_EnState = Brake_EnState
+        self.Brake_Flt1 = Brake_Flt1
+        self.Brake_Flt2 = Brake_Flt2
+        self.Brake_PedalActual = Brake_PedalActual
+    
 
 class Brake_Command:
     def __init__(self):
@@ -164,6 +199,24 @@ class Brake_Command:
         self.Brake_EnCtrl = Brake_EnCtrl
         self.Brake_Dec = Brake_Dec
         self.Brake_Pedal_Target = Brake_Pedal_Target
+    
+    def setDataFromCANMessage(self, data):
+        self.data = data
+        self.dataParser()
+        self.toInt()
+    
+    def dataParser(self):
+        self.raw_Brake_EnCtrl = self.data[0].to_bytes(1, byteorder='big')
+        self.raw_Brake_Dec = self.data[1:2+1]
+        self.raw_Brake_Pedal_Target = self.data[3:4+1]
+        self.raw_checksum_101 = self.data[7].to_bytes(1, byteorder='big')
+    
+    def toInt(self):
+        self.Brake_EnCtrl = int.from_bytes(self.raw_Brake_EnCtrl,"big")
+        self.Brake_Dec = int.from_bytes(self.raw_Brake_Dec,"big")
+        self.Brake_Pedal_Target = int.from_bytes(self.raw_Brake_Pedal_Target,"big")
+        self.checksum_101 = int.from_bytes(self.raw_checksum_101,"big")
+
     
     def toData(self):
         self.data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
@@ -226,6 +279,28 @@ class Throttle_Report:
         print("Dirve_Flt2 : ".ljust(30) + str(self.Dirve_Flt2))
         print("Dirve_ThrottlePedalActual : ".ljust(30) + str(self.Dirve_ThrottlePedalActual))
         print("---------------------")
+    
+    def toData(self):
+        self.data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+
+        self.raw_Dirve_EnState = self.Dirve_EnState.to_bytes(1, byteorder='big')
+        self.raw_Dirve_Flt1 = self.Dirve_Flt1.to_bytes(1, byteorder='big')
+        self.raw_Dirve_Flt2 = self.Dirve_Flt2.to_bytes(1, byteorder='big')
+        self.raw_Dirve_ThrottlePedalActual = self.Dirve_ThrottlePedalActual.to_bytes(2, byteorder='big')
+
+        self.data[0] = int.from_bytes((self.raw_Dirve_EnState), byteorder="big")
+        self.data[1] = int.from_bytes((self.raw_Dirve_Flt1), byteorder="big")
+        self.data[2] = int.from_bytes((self.raw_Dirve_Flt2), byteorder="big")
+
+        self.data[3] = self.raw_Dirve_ThrottlePedalActual[0]
+        self.data[4] = self.raw_Dirve_ThrottlePedalActual[1]
+
+    def setDataFromInt(self, Dirve_EnState, Dirve_Flt1, Dirve_Flt2, Dirve_ThrottlePedalActual):
+        self.Dirve_EnState = Dirve_EnState
+        self.Dirve_Flt1 = Dirve_Flt1
+        self.Dirve_Flt2 = Dirve_Flt2
+        self.Dirve_ThrottlePedalActual = Dirve_ThrottlePedalActual
+    
 
 class Throttle_Command:
     def __init__(self):
@@ -237,6 +312,26 @@ class Throttle_Command:
         self.Dirve_Acc = Dirve_Acc
         self.Dirve_ThrottlePedalTarget = Dirve_ThrottlePedalTarget
         self.Dirve_SpeedTarget = Dirve_SpeedTarget
+    
+    def setDataFromCANMessage(self, data):
+        self.data = data
+        self.dataParser()
+        self.toInt()
+    
+    def dataParser(self):
+        self.raw_Dirve_EnCtrl = self.data[0].to_bytes(1, byteorder='big')
+        self.raw_Dirve_Acc = self.data[1:2+1]
+        self.raw_Dirve_ThrottlePedalTarget = self.data[3:4+1]
+        self.raw_Dirve_SpeedTarget = self.data[5:6+1]
+        self.raw_checksum_100 = self.data[7].to_bytes(1, byteorder='big')
+    
+    def toInt(self):
+        self.Dirve_EnCtrl = int.from_bytes(self.raw_Dirve_EnCtrl,"big")
+        self.Dirve_Acc = int.from_bytes(self.raw_Dirve_Acc,"big")
+        self.Dirve_ThrottlePedalTarget = int.from_bytes(self.raw_Dirve_ThrottlePedalTarget,"big")
+        self.Dirve_SpeedTarget = int.from_bytes(self.raw_Dirve_SpeedTarget,"big")
+        self.checksum_100 = int.from_bytes(self.raw_checksum_100,"big")
+
     
     def toData(self):
         self.data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
