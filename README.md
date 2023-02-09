@@ -2,6 +2,8 @@
 
 ```
 pip3 install python-can
+pip3 install python-can-remote
+pip3 install pygame
 ```
 
 # msg.py
@@ -37,3 +39,23 @@ CANメッセージから、メッセージのパラメータにパースする
 2. （内部的に）dataParser
 3. （内部的に）toInt
 4. toData
+
+# handle_controller.py の使い方
+
+1. python-can-remote を起動する
+
+```
+python -m can_remote --interface=virtual --channel=0 --bitrate=500000
+```
+
+2. ハンコンの値を取得して、CANに流す
+
+```
+python3 handle_controller.py
+```
+
+3. CANの値を確認する
+
+```
+python3 python-can-remote_viewer.py
+```
