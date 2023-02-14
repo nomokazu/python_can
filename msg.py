@@ -259,47 +259,47 @@ class Throttle_Report:
     # データ型の配列から、それぞれのデータを取り出す
     # とりあえずはあえて bytearray 型　を維持するようにする
     def dataParser(self):
-        self.raw_Dirve_EnState = self.data[0].to_bytes(1, byteorder='big')
-        self.raw_Dirve_Flt1 = self.data[1].to_bytes(1, byteorder='big')
-        self.raw_Dirve_Flt2 = self.data[2].to_bytes(1, byteorder='big')
-        self.raw_Dirve_ThrottlePedalActual = self.data[3:4+1]
+        self.raw_Drive_EnState = self.data[0].to_bytes(1, byteorder='big')
+        self.raw_Drive_Flt1 = self.data[1].to_bytes(1, byteorder='big')
+        self.raw_Drive_Flt2 = self.data[2].to_bytes(1, byteorder='big')
+        self.raw_Drive_ThrottlePedalActual = self.data[3:4+1]
     
     # それぞれのデータについて、bytearray型 から Int 型にして取り出す
     def toInt(self):
-        self.Dirve_EnState = int.from_bytes(self.raw_Dirve_EnState,"big")
-        self.Dirve_Flt1 = int.from_bytes(self.raw_Dirve_Flt1, "big")
-        self.Dirve_Flt2 = int.from_bytes(self.raw_Dirve_Flt2, "big")
-        self.Dirve_ThrottlePedalActual = int.from_bytes(self.raw_Dirve_ThrottlePedalActual, "big")
+        self.Drive_EnState = int.from_bytes(self.raw_Drive_EnState,"big")
+        self.Drive_Flt1 = int.from_bytes(self.raw_Drive_Flt1, "big")
+        self.Drive_Flt2 = int.from_bytes(self.raw_Drive_Flt2, "big")
+        self.Drive_ThrottlePedalActual = int.from_bytes(self.raw_Drive_ThrottlePedalActual, "big")
     
     def view(self):
         print("--- CAN ID = " + str(hex(self.msg_id)).ljust(3,"-") + "----- msg_name = " + str(self.msg_name).ljust(20,"-") +  "--")
         print(self.data)
-        print("Dirve_EnState : ".ljust(30) + str(self.Dirve_EnState))
-        print("Dirve_Flt1 : ".ljust(30) + str(self.Dirve_Flt1))
-        print("Dirve_Flt2 : ".ljust(30) + str(self.Dirve_Flt2))
-        print("Dirve_ThrottlePedalActual : ".ljust(30) + str(self.Dirve_ThrottlePedalActual))
+        print("Drive_EnState : ".ljust(30) + str(self.Drive_EnState))
+        print("Drive_Flt1 : ".ljust(30) + str(self.Drive_Flt1))
+        print("Drive_Flt2 : ".ljust(30) + str(self.Drive_Flt2))
+        print("Drive_ThrottlePedalActual : ".ljust(30) + str(self.Drive_ThrottlePedalActual))
         print("---------------------")
     
     def toData(self):
         self.data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 
-        self.raw_Dirve_EnState = self.Dirve_EnState.to_bytes(1, byteorder='big')
-        self.raw_Dirve_Flt1 = self.Dirve_Flt1.to_bytes(1, byteorder='big')
-        self.raw_Dirve_Flt2 = self.Dirve_Flt2.to_bytes(1, byteorder='big')
-        self.raw_Dirve_ThrottlePedalActual = self.Dirve_ThrottlePedalActual.to_bytes(2, byteorder='big')
+        self.raw_Drive_EnState = self.Drive_EnState.to_bytes(1, byteorder='big')
+        self.raw_Drive_Flt1 = self.Drive_Flt1.to_bytes(1, byteorder='big')
+        self.raw_Drive_Flt2 = self.Drive_Flt2.to_bytes(1, byteorder='big')
+        self.raw_Drive_ThrottlePedalActual = self.Drive_ThrottlePedalActual.to_bytes(2, byteorder='big')
 
-        self.data[0] = int.from_bytes((self.raw_Dirve_EnState), byteorder="big")
-        self.data[1] = int.from_bytes((self.raw_Dirve_Flt1), byteorder="big")
-        self.data[2] = int.from_bytes((self.raw_Dirve_Flt2), byteorder="big")
+        self.data[0] = int.from_bytes((self.raw_Drive_EnState), byteorder="big")
+        self.data[1] = int.from_bytes((self.raw_Drive_Flt1), byteorder="big")
+        self.data[2] = int.from_bytes((self.raw_Drive_Flt2), byteorder="big")
 
-        self.data[3] = self.raw_Dirve_ThrottlePedalActual[0]
-        self.data[4] = self.raw_Dirve_ThrottlePedalActual[1]
+        self.data[3] = self.raw_Drive_ThrottlePedalActual[0]
+        self.data[4] = self.raw_Drive_ThrottlePedalActual[1]
 
-    def setDataFromInt(self, Dirve_EnState, Dirve_Flt1, Dirve_Flt2, Dirve_ThrottlePedalActual):
-        self.Dirve_EnState = Dirve_EnState
-        self.Dirve_Flt1 = Dirve_Flt1
-        self.Dirve_Flt2 = Dirve_Flt2
-        self.Dirve_ThrottlePedalActual = Dirve_ThrottlePedalActual
+    def setDataFromInt(self, Drive_EnState, Drive_Flt1, Drive_Flt2, Drive_ThrottlePedalActual):
+        self.Drive_EnState = Drive_EnState
+        self.Drive_Flt1 = Drive_Flt1
+        self.Drive_Flt2 = Drive_Flt2
+        self.Drive_ThrottlePedalActual = Drive_ThrottlePedalActual
     
 
 class Throttle_Command:
@@ -307,11 +307,11 @@ class Throttle_Command:
         self.msg_id = 0x100
         self.msg_name = "Throttle_Command"
     
-    def setDataFromInt(self, Dirve_EnCtrl, Dirve_Acc, Dirve_ThrottlePedalTarget, Dirve_SpeedTarget):
-        self.Dirve_EnCtrl = Dirve_EnCtrl
-        self.Dirve_Acc = Dirve_Acc
-        self.Dirve_ThrottlePedalTarget = Dirve_ThrottlePedalTarget
-        self.Dirve_SpeedTarget = Dirve_SpeedTarget
+    def setDataFromInt(self, Drive_EnCtrl, Drive_Acc, Drive_ThrottlePedalTarget, Drive_SpeedTarget):
+        self.Drive_EnCtrl = Drive_EnCtrl
+        self.Drive_Acc = Drive_Acc
+        self.Drive_ThrottlePedalTarget = Drive_ThrottlePedalTarget
+        self.Drive_SpeedTarget = Drive_SpeedTarget
     
     def setDataFromCANMessage(self, data):
         self.data = data
@@ -319,36 +319,36 @@ class Throttle_Command:
         self.toInt()
     
     def dataParser(self):
-        self.raw_Dirve_EnCtrl = self.data[0].to_bytes(1, byteorder='big')
-        self.raw_Dirve_Acc = self.data[1:2+1]
-        self.raw_Dirve_ThrottlePedalTarget = self.data[3:4+1]
-        self.raw_Dirve_SpeedTarget = self.data[5:6+1]
+        self.raw_Drive_EnCtrl = self.data[0].to_bytes(1, byteorder='big')
+        self.raw_Drive_Acc = self.data[1:2+1]
+        self.raw_Drive_ThrottlePedalTarget = self.data[3:4+1]
+        self.raw_Drive_SpeedTarget = self.data[5:6+1]
         self.raw_checksum_100 = self.data[7].to_bytes(1, byteorder='big')
     
     def toInt(self):
-        self.Dirve_EnCtrl = int.from_bytes(self.raw_Dirve_EnCtrl,"big")
-        self.Dirve_Acc = int.from_bytes(self.raw_Dirve_Acc,"big")
-        self.Dirve_ThrottlePedalTarget = int.from_bytes(self.raw_Dirve_ThrottlePedalTarget,"big")
-        self.Dirve_SpeedTarget = int.from_bytes(self.raw_Dirve_SpeedTarget,"big")
+        self.Drive_EnCtrl = int.from_bytes(self.raw_Drive_EnCtrl,"big")
+        self.Drive_Acc = int.from_bytes(self.raw_Drive_Acc,"big")
+        self.Drive_ThrottlePedalTarget = int.from_bytes(self.raw_Drive_ThrottlePedalTarget,"big")
+        self.Drive_SpeedTarget = int.from_bytes(self.raw_Drive_SpeedTarget,"big")
         self.checksum_100 = int.from_bytes(self.raw_checksum_100,"big")
 
     
     def toData(self):
         self.data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
 
-        self.raw_Dirve_EnCtrl = self.Dirve_EnCtrl.to_bytes(1, byteorder='big')
-        self.raw_Dirve_Acc = self.Dirve_Acc.to_bytes(2, byteorder='big')
-        self.raw_Dirve_ThrottlePedalTarget = self.Dirve_ThrottlePedalTarget.to_bytes(2, byteorder='big')
-        self.raw_Dirve_SpeedTarget = self.Dirve_SpeedTarget.to_bytes(2, byteorder='big')
+        self.raw_Drive_EnCtrl = self.Drive_EnCtrl.to_bytes(1, byteorder='big')
+        self.raw_Drive_Acc = self.Drive_Acc.to_bytes(2, byteorder='big')
+        self.raw_Drive_ThrottlePedalTarget = self.Drive_ThrottlePedalTarget.to_bytes(2, byteorder='big')
+        self.raw_Drive_SpeedTarget = self.Drive_SpeedTarget.to_bytes(2, byteorder='big')
 
-        self.data[0] = int.from_bytes((self.raw_Dirve_EnCtrl), byteorder="big")
+        self.data[0] = int.from_bytes((self.raw_Drive_EnCtrl), byteorder="big")
 
-        self.data[1] = self.raw_Dirve_Acc[0]
-        self.data[2] = self.raw_Dirve_Acc[1]
-        self.data[3] = self.raw_Dirve_ThrottlePedalTarget[0]
-        self.data[4] = self.raw_Dirve_ThrottlePedalTarget[1]
-        self.data[5] = self.raw_Dirve_SpeedTarget[0]
-        self.data[6] = self.raw_Dirve_SpeedTarget[1]
+        self.data[1] = self.raw_Drive_Acc[0]
+        self.data[2] = self.raw_Drive_Acc[1]
+        self.data[3] = self.raw_Drive_ThrottlePedalTarget[0]
+        self.data[4] = self.raw_Drive_ThrottlePedalTarget[1]
+        self.data[5] = self.raw_Drive_SpeedTarget[0]
+        self.data[6] = self.raw_Drive_SpeedTarget[1]
 
         # チェックサムはダミー
         self.checksum_100 = 0
@@ -357,9 +357,9 @@ class Throttle_Command:
     def view(self):
         print("--- CAN ID = " + str(hex(self.msg_id)).ljust(3,"-") + "----- msg_name = " + str(self.msg_name).ljust(20,"-") +  "--")
         print(self.data)
-        print("Dirve_EnCtrl : ".ljust(30) + str(self.Dirve_EnCtrl))
-        print("Dirve_Acc : ".ljust(30) + str(self.Dirve_Acc))
-        print("Dirve_ThrottlePedalTarget : ".ljust(30) + str(self.Dirve_ThrottlePedalTarget))
-        print("Dirve_SpeedTarget : ".ljust(30) + str(self.Dirve_SpeedTarget))
+        print("Drive_EnCtrl : ".ljust(30) + str(self.Drive_EnCtrl))
+        print("Drive_Acc : ".ljust(30) + str(self.Drive_Acc))
+        print("Drive_ThrottlePedalTarget : ".ljust(30) + str(self.Drive_ThrottlePedalTarget))
+        print("Drive_SpeedTarget : ".ljust(30) + str(self.Drive_SpeedTarget))
         print("checksum_100 : ".ljust(30) + str(self.checksum_100))
         print("---------------------")
