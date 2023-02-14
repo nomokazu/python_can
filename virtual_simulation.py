@@ -3,8 +3,8 @@ import msg
 
 # bus1 = can.interface.Bus('test', bustype='virtual', preserve_timestamps=True)
 # bus2 = can.interface.Bus('test', bustype='virtual')
-bus1 = can.Bus('ws://localhost:54701/', bustype='remote', bitrate=500000, receive_own_messages=True)
-bus2 = can.Bus('ws://localhost:54701/', bustype='remote', bitrate=500000)
+bus1 = can.Bus('http://116.80.92.6:54701/', bustype='remote', bitrate=500000, receive_own_messages=True)
+bus2 = can.Bus('http://116.80.92.6:54701/', bustype='remote', bitrate=500000)
 
 #--------------Steering_Command---------------------
 # Steering_Commandメッセージの作成
