@@ -363,3 +363,61 @@ class Throttle_Command:
         print("Drive_SpeedTarget : ".ljust(30) + str(self.Drive_SpeedTarget))
         print("checksum_100 : ".ljust(30) + str(self.checksum_100))
         print("---------------------")
+
+class WheelSpeed_Report:
+    def __init__(self):
+        self.msg_id = 0x506
+        self.msg_name = "WheelSpeed_Report"
+    
+    def setDataFromCANMessage(self, data):
+        self.data = data
+        self.dataParser()
+        self.toInt()
+
+    # データ型の配列から、それぞれのデータを取り出す
+    # とりあえずはあえて bytearray 型　を維持するようにする
+    def dataParser(self):
+        self.raw_WheelSpeedFL = self.data[0:1+1]
+        self.raw_WheelSpeedFR = self.data[2:3+1]
+        self.raw_WheelSpeedRL = self.data[4:5+1]
+        self.raw_WheelSpeedRR = self.data[6:7+1]
+    
+    # それぞれのデータについて、bytearray型 から Int 型にして取り出す
+    def toInt(self):
+        self.WheelSpeedFL = int.from_bytes(self.raw_WheelSpeedFL,"big")
+        self.WheelSpeedFR = int.from_bytes(self.raw_WheelSpeedFR, "big")
+        self.WheelSpeedRL = int.from_bytes(self.raw_WheelSpeedRL, "big")
+        self.WheelSpeedRR = int.from_bytes(self.raw_WheelSpeedRR, "big")
+    
+    def view(self):
+        print("--- CAN ID = " + str(hex(self.msg_id)).ljust(3,"-") + "----- msg_name = " + str(self.msg_name).ljust(20,"-") +  "--")
+        print(self.data)
+        print("WheelSpeedFL : ".ljust(30) + str(self.raw_WheelSpeedFL))
+        print("WheelSpeedFR : ".ljust(30) + str(self.raw_WheelSpeedFR))
+        print("WheelSpeedRL : ".ljust(30) + str(self.raw_WheelSpeedRL))
+        print("WheelSpeedRR : ".ljust(30) + str(self.raw_WheelSpeedRR))
+        print("---------------------")
+    
+    def toData(self):
+        self.data = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00]
+
+        self.raw_WheelSpeedFL = self.WheelSpeedFL.to_bytes(2, byteorder='big')
+        self.raw_WheelSpeedFR = self.WheelSpeedFR.to_bytes(2, byteorder='big')
+        self.raw_WheelSpeedRL = self.WheelSpeedRL.to_bytes(2, byteorder='big')
+        self.raw_WheelSpeedRR = self.WheelSpeedRR.to_bytes(2, byteorder='big')
+
+        self.data[0] = self.raw_WheelSpeedFL[0]
+        self.data[1] = self.raw_WheelSpeedFL[1]
+        self.data[2] = self.raw_WheelSpeedFR[0]
+        self.data[3] = self.raw_WheelSpeedFR[1]
+        self.data[4] = self.raw_WheelSpeedRL[0]
+        self.data[5] = self.raw_WheelSpeedRL[1]
+        self.data[6] = self.raw_WheelSpeedRR[0]
+        self.data[7] = self.raw_WheelSpeedRR[1]
+
+
+    def setDataFromInt(self, WheelSpeedRR, WheelSpeedRL, WheelSpeedFR, WheelSpeedFL):
+        self.WheelSpeedRR = WheelSpeedRR
+        self.WheelSpeedRL = WheelSpeedRL
+        self.WheelSpeedFR = WheelSpeedFR
+        self.WheelSpeedFL = WheelSpeedFL
