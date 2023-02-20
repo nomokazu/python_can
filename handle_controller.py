@@ -36,15 +36,18 @@ while active:
 
         # ジョイスティックのボタンの入力
         if e.type == pygame.locals.JOYAXISMOTION:
-            print('十時キー:', joystick.get_axis(0), joystick.get_axis(1))
+            # print('十時キー:', joystick.get_axis(0), joystick.get_axis(1), joystick.get_axis(2), joystick.get_axis(3))
             handle = joystick.get_axis(0)
-            pedal = joystick.get_axis(1)
-            accel_pedal = 0
+            pedal = 1- joystick.get_axis(3)
+            accel_pedal = ((-1) * (joystick.get_axis(2)) + 1 ) / 2
             brake_pedal = 0
             if pedal < 0:
-                accel_pedal = abs(pedal)
+                None
+                # accel_pedal = abs(pedal)
             elif pedal > 0.02:
                 brake_pedal = pedal
             handleControllerCommand.setHandleControllerCommandSend(handle, accel_pedal, brake_pedal)
             handleControllerCommand.startCanSend()
-            print("start")
+            if handleControllerCommand.sendFlag == False:
+                handleControllerCommand.sendFlag = True
+            # print("start")
