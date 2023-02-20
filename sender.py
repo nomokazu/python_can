@@ -7,9 +7,8 @@ class HandleControllerCommand:
     def __init__(self):
         # self.bus = can.interface.Bus('ws://localhost:54701/', bustype='remote', preserve_timestamps=True)
         # self.bus = can.interface.Bus('test', bustype='virtual', preserve_timestamps=True)
+        # PIXKITへの送信用
         self.bus = can.interface.Bus(bustype='socketcan', channel="slcan0", bitrate=500000, app_name='python-can')
-
-
 
         # CANメッセージを送信するかしないかを判断するFlag
         self.sendFlag = False
@@ -29,6 +28,7 @@ class HandleControllerCommand:
     # ハンドルコントロールの使用に合わせて変更する
     def convertHandleControllerParameterToCanBusParameter(self):
         # マイナスの値は送れないので、+ 1しておく
+        # 中心が 500 で、0~100になるようにしている
         self.canbus_steering = int((self.steering) * -500 + 500)
         self.canbus_accel_pedal = int(self.accel_pedal * 100)
         self.canbus_brake_pedal = int(self.brake_pedal * 100)
@@ -37,6 +37,7 @@ class HandleControllerCommand:
         self.message_Brake_Command = msg.Brake_Command()
         self.message_Brake_Command.setDataFromInt(1, 10, self.canbus_brake_pedal)
         self.message_Throttle_Command = msg.Throttle_Command()
+        # jerk を 10 にするのがキモ
         self.message_Throttle_Command.setDataFromInt(1, 10, self.canbus_accel_pedal, 100)
         
         self.message_Steering_Command.toData()
@@ -50,15 +51,13 @@ class HandleControllerCommand:
         self.can_msg_Brake_Command = can.Message(arbitration_id = self.message_Brake_Command.msg_id, data= self.message_Brake_Command.data, is_extended_id = False)
         self.can_msg_Throttle_Command = can.Message(arbitration_id = self.message_Throttle_Command.msg_id, data= self.message_Throttle_Command.data, is_extended_id = False)
 
+    # レートをガン無視して送りまくっている
     def canSend(self):
         while True:
-            print(self.sendFlag)
             if self.sendFlag:
-                print("s")
                 self.bus.send(self.can_msg_Steering_Command)
                 self.bus.send(self.can_msg_Brake_Command)
                 self.bus.send(self.can_msg_Throttle_Command)
-            # time.sleep(0.001)
     
     def startCanSend(self):
         self.sendFlag = True
