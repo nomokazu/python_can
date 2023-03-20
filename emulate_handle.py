@@ -27,6 +27,8 @@ class Application(tk.Frame):
             text="左    ステアリング    右",   #表示文字
             )
         l.pack()
+
+        # スライドバー : https://imagingsolution.net/program/python/tkinter/scale_trackbar/
         self.scal_steering_var = tk.DoubleVar()
         scaleH_steering = tk.Scale( self.master, 
                     variable = self.scal_steering_var, 
