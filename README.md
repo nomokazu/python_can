@@ -100,3 +100,30 @@ python3 handle_controller.py
 ```
 
 3. PIXKITのコントローラーを「seld driving」に変更して、CANの制御を受け付けるようにする
+
+# エミュレーションの方法
+
+このエミュレーションでは、ハンドルコントロールによる操作をGUIソフトウェアで行える。
+また、送られたコマンドを元にPIXKITからのフィードバックメッセージも送信される。（ID : 500, 501, 502）
+
+1. sender.py のバスをリモートにする
+
+例
+```
+self.bus = can.interface.Bus('ws://localhost:54701/', bustype='remote', preserve_timestamps=True)
+```
+
+2. python-can-remoteを立ち上げる
+```
+python -m can_remote --interface=virtual --channel=0 --bitrate=500000
+```
+
+3. ハンドルのエミュレーションプログラムを立ち上げる
+```
+python3 emulate_handle.py
+```
+
+4. PIXKITのエミュレーションプログラムを立ち上げる
+```
+python3 emulate_feedback_generator.py
+```
