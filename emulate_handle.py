@@ -1,7 +1,8 @@
 import tkinter as tk
 import os
 import sys
-from python_can import sender
+# from python_can import sender
+import sender
 import threading
 
 steering = 0
@@ -95,6 +96,12 @@ class Application(tk.Frame):
         print(str(self.scal_steering_var.get()))
         print(str(self.scal_brake_var.get()))
         print(str(self.scal_throttle_var.get()))
+        global steering
+        global brake_var
+        global throttle_var
+        steering = self.scal_steering_var.get()
+        brake_var = self.scal_brake_var.get()
+        throttle_var = self.scal_throttle_var.get()
 
 
 def can_sender():
@@ -102,13 +109,15 @@ def can_sender():
     global brake_var
     global throttle_var
     # どういった操作を行うかのシナリオの定義
-    emulation_scenrio = {"axi0" : steering, "axi2" : brake_var, "axi3" : throttle_var}
 
     # ループ
     active = True
     handleControllerCommand = sender.HandleControllerCommand()
     while active:
+        emulation_scenrio = {"axi0" : steering, "axi2" : brake_var, "axi3" : throttle_var}
 
+        # print("hello")
+        print(emulation_scenrio)
         # print を入れると、CANの送信処理が正しく走らなくなるのでデバッグ時以外はprint を消す
         # print('十時キー:', joystick.get_axis(0), joystick.get_axis(1), joystick.get_axis(2), joystick.get_axis(3))
         

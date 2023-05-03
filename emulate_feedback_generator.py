@@ -1,5 +1,6 @@
 import can
-from python_can import msg
+# from python_can import msg
+import msg
 import time
 import threading
 

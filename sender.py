@@ -1,14 +1,15 @@
 import can
 import msg
 import asyncio
+import time
 
 
 class HandleControllerCommand:
     def __init__(self):
-        # self.bus = can.interface.Bus('ws://localhost:54701/', bustype='remote', preserve_timestamps=True)
+        self.bus = can.interface.Bus('ws://localhost:54701/', bustype='remote', preserve_timestamps=True)
         # self.bus = can.interface.Bus('test', bustype='virtual', preserve_timestamps=True)
         # PIXKITへの送信用
-        self.bus = can.interface.Bus(bustype='socketcan', channel="slcan0", bitrate=500000, app_name='python-can')
+        # self.bus = can.interface.Bus(bustype='socketcan', channel="slcan0", bitrate=500000, app_name='python-can')
 
         # CANメッセージを送信するかしないかを判断するFlag
         self.sendFlag = False
@@ -58,6 +59,7 @@ class HandleControllerCommand:
                 self.bus.send(self.can_msg_Steering_Command)
                 self.bus.send(self.can_msg_Brake_Command)
                 self.bus.send(self.can_msg_Throttle_Command)
+                time.sleep(0.01)
     
     def startCanSend(self):
         self.sendFlag = True
