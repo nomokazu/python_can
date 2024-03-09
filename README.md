@@ -74,7 +74,7 @@ Lawicel CAN を USB接続した状態で、以下のコマンドを実行する�
 
 ```
 sudo slcand -o -s6 -t hw  /dev/ttyUSB0 
-sudo ip link set up slcan0
+sudo ip link set up can0
 ```
 
 なお、Lawicel CAN をつなぎ直した場合は、 /dev/ttyUSBX の X が 0 からインクリメントされるかもしれないので注意。
